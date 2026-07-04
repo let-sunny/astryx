@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-import {headers} from 'next/headers';
+import {getDefaultIsMobile} from '../../lib/serverMobileHint';
 import {DocsShell} from '../../components/DocsShell';
 import {SiteFooter} from '../../components/SiteFooter';
 import {components} from '../../generated/componentRegistry';
@@ -13,9 +13,7 @@ export default async function DocsLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const headersList = await headers();
-  const ua = headersList.get('user-agent') ?? '';
-  const defaultIsMobile = /mobile|android|iphone|ipad/i.test(ua);
+  const defaultIsMobile = await getDefaultIsMobile();
 
   return (
     <DocsShell

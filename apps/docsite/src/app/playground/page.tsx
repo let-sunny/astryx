@@ -2,7 +2,7 @@
 
 import type {Metadata} from 'next';
 import {Suspense} from 'react';
-import {headers} from 'next/headers';
+import {getDefaultIsMobile} from '../../lib/serverMobileHint';
 import {PlaygroundClient} from './PlaygroundClient';
 
 export const metadata: Metadata = {
@@ -11,9 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PlaygroundPage() {
-  const headersList = await headers();
-  const ua = headersList.get('user-agent') ?? '';
-  const defaultIsMobile = /mobile|android|iphone|ipad/i.test(ua);
+  const defaultIsMobile = await getDefaultIsMobile();
 
   return (
     <Suspense fallback={null}>

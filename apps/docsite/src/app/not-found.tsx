@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-import {headers} from 'next/headers';
+import {getDefaultIsMobile} from '../lib/serverMobileHint';
 import {AppShell} from '@astryxdesign/core/AppShell';
 import {Center} from '@astryxdesign/core/Center';
 import {VStack} from '@astryxdesign/core/Layout';
@@ -10,9 +10,7 @@ import {SiteFooter} from '../components/SiteFooter';
 import styles from './not-found.module.css';
 
 export default async function NotFound() {
-  const headersList = await headers();
-  const ua = headersList.get('user-agent') ?? '';
-  const defaultIsMobile = /mobile|android|iphone|ipad/i.test(ua);
+  const defaultIsMobile = await getDefaultIsMobile();
 
   return (
     <AppShell
