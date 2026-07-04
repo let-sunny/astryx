@@ -26,6 +26,11 @@ import {packages} from '../generated/packageRegistry';
 import {templates} from '../generated/templateRegistry';
 import {blogPosts} from '../generated/blogRegistry';
 
+// Fully build-time static (mirrors each route's generateStaticParams), so it
+// can be emitted as a file. Required for the canary static-export build
+// (output:'export'); a no-op for the latest server build.
+export const dynamic = 'force-static';
+
 // Theme packages don't get a /docs/[topic] reference page (see the docs route's
 // own filter); keep the sitemap aligned with what actually renders.
 function isThemePackage(name: string): boolean {

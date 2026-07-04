@@ -6,7 +6,7 @@
 
 'use client';
 
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useMemo, useState, Suspense} from 'react';
 import type {CSSProperties} from 'react';
 import {useSearchParams, useRouter, usePathname} from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
@@ -95,7 +95,7 @@ interface TemplateItem {
   source: string;
 }
 
-export default function TemplatesPage() {
+function TemplatesGallery() {
   const {isMobile} = useAppShellMobile();
 
   // Flat, display-ordered list of available templates. Ordered by category
@@ -199,7 +199,10 @@ export default function TemplatesPage() {
   );
 
   return (
-    <Section maxWidth={layout.contentMaxWidth} padding={6} style={{marginInline: 'auto'}}>
+    <Section
+      maxWidth={layout.contentMaxWidth}
+      padding={6}
+      style={{marginInline: 'auto'}}>
       <VStack gap={10}>
         {/* Header */}
         <VStack gap={6} align="stretch">
@@ -301,5 +304,16 @@ export default function TemplatesPage() {
         variant={isMobile ? 'fullscreen' : undefined}
       />
     </Section>
+  );
+}
+
+// useSearchParams (in TemplatesGallery) needs a Suspense boundary to be
+// compatible with the canary static-export build (output:'export'); the server
+// build tolerates its absence, the export does not.
+export default function TemplatesPage() {
+  return (
+    <Suspense>
+      <TemplatesGallery />
+    </Suspense>
   );
 }
