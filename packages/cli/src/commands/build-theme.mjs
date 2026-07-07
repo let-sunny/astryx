@@ -846,12 +846,21 @@ export function registerTheme(program) {
         if (component.length > 0) {
           const componentInner = component.join('\n\n');
           const componentScope = `@scope (${scopeSelector}) to (${scopeTo}) {\n${componentInner}\n}`;
-          const colorSchemeDecl = componentScope.includes('light-dark(')
-            ? '  :root { color-scheme: light dark; }\n\n'
-            : '';
-          cssParts.push(
-            `@layer astryx-theme {\n${colorSchemeDecl}${componentScope}\n}`,
-          );
+          // The LightningCSS light-dark() polyfill only lowers correctly when a
+          // `color-scheme` declaration exists in the same bundle it's bootstrapping.
+          // Moved from @layer astryx-theme to @layer reset so this no longer wins
+          // purely on cascade-layer order against reset.css's `html[data-theme]`
+          // -> color-scheme mapping (what <Theme mode="..."> relies on to force a
+          // mode). NOTE: bare `:root` still has higher specificity (0,1,0) than
+          // reset.css's `:where(html[data-theme="dark"])` (0,0,0), so within the
+          // now-shared @layer reset this rule still wins the conflict and mode
+          // forcing remains broken for built themes with light-dark() values --
+          // verified empirically, see issue writeup. This relocation alone is NOT
+          // a complete fix.
+          if (componentScope.includes('light-dark(')) {
+            cssParts.push('@layer reset {\n  :root { color-scheme: light dark; }\n}');
+          }
+          cssParts.push(`@layer astryx-theme {\n${componentScope}\n}`);
         }
         // On-media rules (MediaTheme dark/light surface overrides)
         if (_generateOnMediaCSS) {
